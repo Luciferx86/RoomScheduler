@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "336939421878",
+    "firebase_url": "https://meeting-room-cdf98.firebaseio.com",
+    "project_id": "meeting-room-cdf98",
+    "storage_bucket": "meeting-room-cdf98.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:336939421878:android:be4052a8278101a99e5617",
+        "android_client_info": {
+          "package_name": "com.example.room_scheduler"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "336939421878-ql4jfrlnr5tqvegi6ppd985r0k6s7usd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzU3Qyc3-KEVeAbJwvcYIAchVD6Y6l2YM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "336939421878-ql4jfrlnr5tqvegi6ppd985r0k6s7usd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
