@@ -9,7 +9,6 @@ import 'package:room_scheduler/utils/FirebaseKeys.dart';
 import 'package:room_scheduler/utils/MyButton.dart';
 import 'package:room_scheduler/utils/Schedule.dart';
 import 'package:room_scheduler/utils/Strings.dart';
-import 'package:room_scheduler/utils/CommonFunctions.dart';
 
 class ScheduleAdder extends StatefulWidget {
   @override
@@ -93,21 +92,15 @@ class ScheduleAdderState extends State<ScheduleAdder> {
             children: <Widget>[
               InkWell(
                 onTap: () {
-                  DatePicker.showTimePicker(
-                    context,
-                    showSecondsColumn: false,
-                    theme: DatePickerTheme(
-                      containerHeight: 210.0,
-                    ),
-                    showTitleActions: true,
-                    onConfirm: (time) {
-                      setState(() {
-                        startTime = time;
-                      });
-                    },
-                    currentTime: startTime,
-                    locale: LocaleType.en,
-                  );
+                  DatePicker.showTimePicker(context,
+                      theme: DatePickerTheme(
+                        containerHeight: 210.0,
+                      ),
+                      showTitleActions: true, onConfirm: (time) {
+                    setState(() {
+                      startTime = time;
+                    });
+                  }, currentTime: startTime, locale: LocaleType.en);
                 },
                 child: Column(
                   children: <Widget>[
@@ -122,7 +115,6 @@ class ScheduleAdderState extends State<ScheduleAdder> {
               InkWell(
                 onTap: () {
                   DatePicker.showTimePicker(context,
-                      showSecondsColumn: false,
                       theme: DatePickerTheme(
                         containerHeight: 210.0,
                       ),
@@ -179,6 +171,14 @@ class ScheduleAdderState extends State<ScheduleAdder> {
                 }).then((onValue) {
                   fetchSchedules();
                 });
+              } else {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Invalid Schedule"),
+                      );
+                    });
               }
             },
           )
@@ -208,8 +208,7 @@ class ScheduleAdderState extends State<ScheduleAdder> {
   }
 
   bool isValidSchedule(Schedule newSchedule) {
-    DateTime interrStartTime;
-    DateTime interrEndTime;
+
     DateTime newStartTime = DateTime.parse(newSchedule.startTime);
     DateTime newEndTime = DateTime.parse(newSchedule.endTime);
     log("allSchedules size : " + this.allSchedules.length.toString());
@@ -218,28 +217,11 @@ class ScheduleAdderState extends State<ScheduleAdder> {
       DateTime startTime = DateTime.parse(schedule.startTime);
       DateTime endTime = DateTime.parse(schedule.endTime);
       log("comparing" + startTime.compareTo(newStartTime).toString());
-
-      //newStartTime before startTime & newEndTime before endTime & newEndTime after startTime
       if (startTime.compareTo(newStartTime) > 0 &&
-          endTime.compareTo(newEndTime) > 0 &&
-          startTime.compareTo(newEndTime) < 0) {
+          endTime.compareTo(newEndTime) > 0) {
         log("invallid");
         retVal = false;
-        interrStartTime = startTime;
-        interrEndTime = endTime;
       }
-
-      //newStartTime after startTime & newEndTime after endTime & newStartTime before endTime
-      if (startTime.compareTo(newStartTime) < 0 &&
-          endTime.compareTo(newEndTime) < 0 &&
-          endTime.compareTo(newStartTime) > 0) {
-        log("invallid");
-        retVal = false;
-        interrStartTime = startTime;
-        interrEndTime = endTime;
-      }
-
-      //newStartTime before startTime & newEndTime after endTime
       if (startTime.compareTo(newStartTime) > 0 &&
           endTime.compareTo(newEndTime) < 0) {
         log("invalid");
@@ -247,17 +229,6 @@ class ScheduleAdderState extends State<ScheduleAdder> {
       }
     });
     log("valid");
-    if (!retVal) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Invalid Schedule"),
-              content: Text(
-                  "Interrupting Schedule: ${formatTime(interrStartTime)} - ${formatTime(interrEndTime)}"),
-            );
-          });
-    }
     return retVal;
   }
 

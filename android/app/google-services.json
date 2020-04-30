@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "336939421878",
-    "firebase_url": "https://meeting-room-cdf98.firebaseio.com",
-    "project_id": "meeting-room-cdf98",
-    "storage_bucket": "meeting-room-cdf98.appspot.com"
+    "project_number": "358712541227",
+    "firebase_url": "https://meeting-room-ee52b.firebaseio.com",
+    "project_id": "meeting-room-ee52b",
+    "storage_bucket": "meeting-room-ee52b.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:336939421878:android:be4052a8278101a99e5617",
+        "mobilesdk_app_id": "1:358712541227:android:8bf30c2e513326b2e86a6e",
         "android_client_info": {
           "package_name": "com.example.room_scheduler"
         }
       },
       "oauth_client": [
         {
-          "client_id": "336939421878-ql4jfrlnr5tqvegi6ppd985r0k6s7usd.apps.googleusercontent.com",
+          "client_id": "358712541227-6tkbf4j740lh3qhqebv0r9hhvlgln6gj.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCzU3Qyc3-KEVeAbJwvcYIAchVD6Y6l2YM"
+          "current_key": "AIzaSyAXPg15N531ltwTMAsAWNvqe-L3F50Jt6I"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "336939421878-ql4jfrlnr5tqvegi6ppd985r0k6s7usd.apps.googleusercontent.com",
+              "client_id": "358712541227-6tkbf4j740lh3qhqebv0r9hhvlgln6gj.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

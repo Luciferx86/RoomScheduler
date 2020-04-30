@@ -20,6 +20,7 @@ dependencies:
   flutter_datetime_picker: ^1.3.4
   timeline_list: ^0.0.3
   bubble: ^1.1.9+1
+  image_picker:
   flutter:
     sdk: flutter
 

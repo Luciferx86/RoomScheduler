@@ -18,11 +18,11 @@ class MyButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 color: RoomSchedulerColors.orange),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
               child: Text(
                 this.text,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 17),
               ),
             ),
           ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:room_scheduler/src/AddOrganisation.dart';
+import 'package:room_scheduler/src/CreateAccount.dart';
 import 'package:room_scheduler/src/DashBoard.dart';
+import 'package:room_scheduler/src/EntryPoint.dart';
 import 'package:room_scheduler/src/LoginPage.dart';
 
 void main() => runApp(MyApp());
@@ -10,10 +13,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Room Scheduling',
-      initialRoute: '/login',
+      initialRoute: '/entry',
       routes: {
+        '/entry': (context) => EntryPoint(),
         '/login': (context) => LoginPage(),
         '/dashboard': (context) => Dashboard(),
+        '/create': (context) => CreateAccount(),
+        '/add': (context) => AddOrganisation(),
       },
       theme: ThemeData(
         // This is the theme of your application.
