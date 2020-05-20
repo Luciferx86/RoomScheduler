@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:room_scheduler/utils/Colors.dart';
 import 'package:room_scheduler/utils/CustomEditText.dart';
@@ -14,19 +15,77 @@ class _CreateAccountState extends State<CreateAccount> {
   String password = "";
   String confirmPass = "";
   void createAccount() {
-    print(this.email);
-    print(this.password);
-    print(this.confirmPass);
-    Navigator.pushNamed(context, '/add', arguments: {
-      "email": email,
-      "pass": password,
-      "confirmPass": confirmPass
-    });
+    if (EmailValidator.validate(this.email)) {
+      if (this.password.length > 4) {
+        if (this.password == this.confirmPass) {
+          print(this.email);
+          print(this.password);
+          print(this.confirmPass);
+          Navigator.pushNamed(context, '/add',
+              arguments: {"email": email, "pass": password});
+        } else {
+          showDialog(
+              // barrierDismissible: false,
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Error"),
+                  content: Text("Passwords do not match"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                );
+              });
+        }
+      } else {
+        showDialog(
+            // barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Error"),
+                content: Text("Passwords must be atleast 5 characters"),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+      }
+    } else {
+      showDialog(
+          // barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Error"),
+              content: Text("Invalid Email"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(

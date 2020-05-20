@@ -11,6 +11,8 @@ import 'package:room_scheduler/utils/Schedule.dart';
 import 'package:room_scheduler/utils/Strings.dart';
 
 class ScheduleAdder extends StatefulWidget {
+  final String title;
+  const ScheduleAdder({this.title, Key key}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return ScheduleAdderState();
@@ -21,7 +23,9 @@ String formatTime(DateTime time) {
   String myTime =
       (time.hour > 12 ? (time.hour - 12).toString() : time.hour.toString()) +
           ":" +
-          time.minute.toString() +
+          (time.minute.toString().length == 1
+              ? "0" + time.minute.toString()
+              : time.minute.toString()) +
           (time.hour > 12 ? " PM" : " AM");
   return myTime;
 }
@@ -38,7 +42,7 @@ class ScheduleAdderState extends State<ScheduleAdder> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          Strings.addScheduleTitle,
+          widget.title,
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: IconThemeData(color: Colors.black),
@@ -96,6 +100,7 @@ class ScheduleAdderState extends State<ScheduleAdder> {
                       theme: DatePickerTheme(
                         containerHeight: 210.0,
                       ),
+                      showSecondsColumn: false,
                       showTitleActions: true, onConfirm: (time) {
                     setState(() {
                       startTime = time;
@@ -118,6 +123,7 @@ class ScheduleAdderState extends State<ScheduleAdder> {
                       theme: DatePickerTheme(
                         containerHeight: 210.0,
                       ),
+                      showSecondsColumn: false,
                       showTitleActions: true, onConfirm: (time) {
                     setState(() {
                       endTime = time;
@@ -208,7 +214,6 @@ class ScheduleAdderState extends State<ScheduleAdder> {
   }
 
   bool isValidSchedule(Schedule newSchedule) {
-
     DateTime newStartTime = DateTime.parse(newSchedule.startTime);
     DateTime newEndTime = DateTime.parse(newSchedule.endTime);
     log("allSchedules size : " + this.allSchedules.length.toString());

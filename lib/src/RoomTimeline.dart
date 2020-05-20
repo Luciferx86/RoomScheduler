@@ -8,6 +8,8 @@ import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
 class RoomTimeline extends StatefulWidget {
+  final String title;
+  const RoomTimeline({this.title, Key key}) : super(key: key);
   @override
   _RoomTimelineState createState() => _RoomTimelineState();
 }
@@ -22,7 +24,11 @@ class _RoomTimelineState extends State<RoomTimeline> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: RoomSchedulerColors.orange,
-          title: Text(this.selectedRoom),
+          title: Text(
+            widget.title,
+            style: TextStyle(color: Colors.black),
+          ),
+          iconTheme: IconThemeData(color: Colors.black),
           automaticallyImplyLeading: false,
         ),
         body: Column(
