@@ -11,6 +11,7 @@ class CreateAccount extends StatefulWidget {
 }
 
 class _CreateAccountState extends State<CreateAccount> {
+  final formKey = GlobalKey<FormState>();
   String email = "";
   String password = "";
   String confirmPass = "";
@@ -82,6 +83,16 @@ class _CreateAccountState extends State<CreateAccount> {
     }
   }
 
+  void validateForm() {
+    if (formKey.currentState.validate()) {
+      print(this.email);
+      print(this.password);
+      print(this.confirmPass);
+      Navigator.pushNamed(context, '/add',
+          arguments: {"email": email, "pass": password});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,38 +115,98 @@ class _CreateAccountState extends State<CreateAccount> {
             "Create An Account",
             style: TextStyle(fontSize: 20),
           ),
-          CustomEditText(
-            label: "Email",
-            hint: "someone@example.com",
-            isPass: false,
-            onChanged: (val) {
-              setState(() {
-                email = val;
-              });
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            child: Form(
+                key: formKey,
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(
+                      height: 100,
+                    ),
+                    TextFormField(
+                      style: TextStyle(
+                        fontSize: 20
+                      ),
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.email),
+                        hintText: 'someone@example.com',
+                        labelText: 'Email *',
+                      ),
+                      onChanged: (String val) {
+                        setState(() {
+                          email = val;
+                        });
+                      },
+                      onSaved: (String value) {
+                        // This optional block of code can be used to run
+                        // code when the user saves the form.
+                      },
+                      validator: (String value) {
+                        return EmailValidator.validate(this.email)
+                            ? null
+                            : 'Invalid Email';
+                      },
+                    ),
+                    SizedBox(height: 25,),
+                    TextFormField(
+                      style: TextStyle(
+                        fontSize: 20
+                      ),
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.lock),
+                        hintText: '********',
+                        labelText: 'Password *',
+                      ),
+                      obscureText: true,
+                      onChanged: (String val) {
+                        setState(() {
+                          password = val;
+                        });
+                      },
+                      onSaved: (String value) {
+                        // This optional block of code can be used to run
+                        // code when the user saves the form.
+                      },
+                      validator: (String value) {
+                        return value.length < 8
+                            ? 'Password less than 8 chars'
+                            : null;
+                      },
+                    ),
+                    SizedBox(height: 25,),
+                    TextFormField(
+                      style: TextStyle(
+                        fontSize: 20
+                      ),
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.lock),
+                        hintText: '********',
+                        labelText: 'Confirm Password *',
+                      ),
+                      obscureText: true,
+                      onChanged: (String val) {
+                        setState(() {
+                          confirmPass = val;
+                        });
+                      },
+                      onSaved: (String value) {
+                        // This optional block of code can be used to run
+                        // code when the user saves the form.
+                      },
+                      validator: (String value) {
+                        return this.password != this.confirmPass
+                            ? 'Passwords do not match'
+                            : null;
+                      },
+                    ),
+                    SizedBox(
+                      height: 100,
+                    ),
+                    MyButton(text: "Create Account", onTap: this.validateForm)
+                  ],
+                )),
           ),
-          CustomEditText(
-              label: "Password",
-              hint: "password",
-              isPass: true,
-              onChanged: (val) {
-                setState(() {
-                  password = val;
-                });
-              }),
-          CustomEditText(
-              label: "Confirm Password",
-              hint: "password",
-              isPass: true,
-              onChanged: (val) {
-                setState(() {
-                  confirmPass = val;
-                });
-              }),
-          SizedBox(
-            height: 30,
-          ),
-          MyButton(text: "Create Account", onTap: this.createAccount)
         ],
       ),
     );

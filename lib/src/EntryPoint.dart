@@ -12,6 +12,7 @@ class EntryPoint extends StatelessWidget {
     String orgName = prefs.getString("orgName") ?? null;
     if (orgName != null) {
       // log("orgName = " + orgName);
+      
       return true;
     } else {
       // log("orgName = null");

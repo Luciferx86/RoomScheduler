@@ -12,7 +12,8 @@ import 'package:room_scheduler/utils/Strings.dart';
 
 class ScheduleAdder extends StatefulWidget {
   final String title;
-  const ScheduleAdder({this.title, Key key}) : super(key: key);
+  final List<String> allRooms;
+  const ScheduleAdder({this.title, this.allRooms, key}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return ScheduleAdderState();
@@ -65,18 +66,7 @@ class ScheduleAdderState extends State<ScheduleAdder> {
               value: selectedRoom,
               isExpanded: true,
               icon: Icon(Icons.arrow_drop_down),
-              items: [
-                DropdownMenuItem<String>(
-                    value: "Room 1", child: Text("Room 1")),
-                DropdownMenuItem<String>(
-                    value: "Room 2", child: Text("Room 2")),
-                DropdownMenuItem<String>(
-                    value: "Room 3", child: Text("Room 3")),
-                DropdownMenuItem<String>(
-                    value: "Room 4", child: Text("Room 4")),
-                DropdownMenuItem<String>(
-                    value: "Room 5", child: Text("Room 5")),
-              ],
+              items: this.getRooms(),
               onChanged: (String room) {
                 setState(() {
                   selectedRoom = room;
@@ -167,14 +157,35 @@ class ScheduleAdderState extends State<ScheduleAdder> {
               if (isValidSchedule(currSchedule)) {
                 FirebaseDatabase()
                     .reference()
-                    .child(FirebaseKeys.roomsKey)
-                    .child(this.selectedRoom)
+                    .child("Orgs")
+                    .child(widget.title)
+                    .child("allRooms")
+                    .child(selectedRoom)
+                    .child("schedules")
                     .push()
                     .set({
                   "startTime": startTime.toString(),
                   "endTime": endTime.toString(),
                   "desc": "this.desc"
                 }).then((onValue) {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Schedule Added!"),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text("OK"),
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/dashboard',
+                                );
+                              },
+                            )
+                          ],
+                        );
+                      });
                   fetchSchedules();
                 });
               } else {
@@ -197,15 +208,20 @@ class ScheduleAdderState extends State<ScheduleAdder> {
     List<Schedule> allSchedules = [];
     FirebaseDatabase.instance
         .reference()
-        .child("rooms")
+        .child("Orgs")
+        .child(widget.title)
+        .child("allRooms")
         .child(selectedRoom)
+        .child("schedules")
         .once()
         .then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
-      values.forEach((key, val) {
-        allSchedules
-            .add(Schedule(val["startTime"], val["endTime"], val["desc"]));
-      });
+      try {
+        values.forEach((key, val) {
+          allSchedules
+              .add(Schedule(val["startTime"], val["endTime"], val["desc"]));
+        });
+      } catch (e) {}
       setState(() {
         this.allSchedules = allSchedules;
         log(allSchedules.length.toString());
@@ -222,16 +238,32 @@ class ScheduleAdderState extends State<ScheduleAdder> {
       DateTime startTime = DateTime.parse(schedule.startTime);
       DateTime endTime = DateTime.parse(schedule.endTime);
       log("comparing" + startTime.compareTo(newStartTime).toString());
-      if (startTime.compareTo(newStartTime) > 0 &&
-          endTime.compareTo(newEndTime) > 0) {
+      if(startTime.isBefore(newStartTime) && endTime.isBefore(newEndTime) && endTime.isAfter(newStartTime)){
         log("invallid");
         retVal = false;
       }
-      if (startTime.compareTo(newStartTime) > 0 &&
-          endTime.compareTo(newEndTime) < 0) {
-        log("invalid");
+      if(startTime.isAfter(newStartTime) && endTime.isAfter(newEndTime) && startTime.isBefore(newEndTime)){
+        log("invallid");
         retVal = false;
       }
+      if(startTime.isBefore(newStartTime) && endTime.isAfter(newEndTime)){
+        log("invallid");
+        retVal = false;
+      }
+      if(startTime.isAfter(newStartTime) && endTime.isBefore(newEndTime)){
+        log("invallid");
+        retVal = false;
+      }
+      // if (startTime.compareTo(newStartTime) > 0 &&
+      //     endTime.compareTo(newEndTime) > 0) {
+      //   log("invallid");
+      //   retVal = false;
+      // }
+      // if (startTime.compareTo(newStartTime) > 0 &&
+      //     endTime.compareTo(newEndTime) < 0) {
+      //   log("invalid");
+      //   retVal = false;
+      // }
     });
     log("valid");
     return retVal;
@@ -241,5 +273,14 @@ class ScheduleAdderState extends State<ScheduleAdder> {
   void initState() {
     super.initState();
     fetchSchedules();
+  }
+
+  List<DropdownMenuItem<String>> getRooms() {
+    List<DropdownMenuItem<String>> rooms = [];
+    widget.allRooms.forEach((roomName) {
+      rooms.add(
+          DropdownMenuItem<String>(value: roomName, child: Text(roomName)));
+    });
+    return rooms;
   }
 }

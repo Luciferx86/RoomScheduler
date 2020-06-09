@@ -30,6 +30,7 @@ class DashBoardState extends State<Dashboard> {
   Future<void> loadOrgName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String orgName = prefs.getString("orgName") ?? "";
+    List<String> allRooms = [];
     log("org:" + orgName);
     FirebaseDatabase.instance
         .reference()
@@ -38,18 +39,19 @@ class DashBoardState extends State<Dashboard> {
         .child("allRooms")
         .once()
         .then((DataSnapshot snapshot) {
-      List<Map<dynamic, dynamic>> values = snapshot.value;
+      Map values = snapshot.value;
       log("yoyo");
       log(values.toString());
-      // values.forEach((key, val) {
-      //   log(val["name"]);
-      // });
+      values.forEach((key,val) {
+        log(val["name"]);
+        allRooms.add(key);
+      });
     });
     this.setState(() {
       this.orgName = orgName;
       allChildren = [
-        RoomTimeline(title: orgName),
-        ScheduleAdder(title: this.orgName),
+        RoomTimeline(title: orgName,allRooms: allRooms,),
+        ScheduleAdder(title: this.orgName, allRooms : allRooms),
         Container(
           color: Colors.yellow,
         )

@@ -18,6 +18,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:path/path.dart' as path;
 
+import '../utils/MyButton.dart';
+
 class AddOrganisation extends StatefulWidget {
   @override
   _AddOrganisationState createState() => _AddOrganisationState();
@@ -26,7 +28,7 @@ class AddOrganisation extends StatefulWidget {
 class _AddOrganisationState extends State<AddOrganisation> {
   String orgName = "";
   File logo;
-  List allRooms = [];
+  Map allRooms = new Map();
   List allTeams = [];
   List allEmployees = [];
   var admin;
@@ -49,7 +51,7 @@ class _AddOrganisationState extends State<AddOrganisation> {
         context: context,
         builder: (BuildContext context) => AddRoomsDialog(
               allRooms: this.allRooms,
-              onDone: (List allRooms) {
+              onDone: (Map allRooms) {
                 this.setState(() {
                   this.allRooms = allRooms;
                 });
@@ -227,11 +229,43 @@ class _AddOrganisationState extends State<AddOrganisation> {
               SizedBox(
                 height: 30,
               ),
-              ButtonWithText(
-                buttonText: "Select Organisation Logo",
-                text: this.logoText,
+              MyButton(
+                text: "Select Organisation Logo",
                 onTap: this.getImageFromGallery,
               ),
+              // ButtonWithText(
+              //   buttonText: "Select Organisation Logo",
+              //   text: this.logoText,
+              //   onTap: this.getImageFromGallery,
+              // ),
+              this.logo == null
+                  ? SizedBox()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(
+                          width: 40,
+                        ),
+                        Container(
+                          height: 150,
+                          width: 150,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(image: FileImage(logo)),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        InkWell(
+                            onTap: () {
+                              setState(() {
+                                logoText = "No Logo Added";
+                                logo = null;
+                              });
+                            },
+                            child: Icon(Icons.cancel)),
+                      ],
+                    ),
               SizedBox(
                 height: 30,
               ),
@@ -258,6 +292,7 @@ class _AddOrganisationState extends State<AddOrganisation> {
               SizedBox(
                 height: 30,
               ),
+
               MyButton(
                 text: "Create",
                 onTap: () {
@@ -265,6 +300,9 @@ class _AddOrganisationState extends State<AddOrganisation> {
                   this.createOrg();
                 },
               ),
+              SizedBox(
+                height: 100,
+              )
             ],
           ),
         ),

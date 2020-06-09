@@ -4,7 +4,7 @@ import '../utils/CustomEditText.dart';
 
 class AddRoomsDialog extends StatefulWidget {
   final onDone;
-  final List allRooms;
+  final Map allRooms;
   const AddRoomsDialog({Key key, this.onDone, this.allRooms}) : super(key: key);
   _AddRoomsDialog createState() => _AddRoomsDialog();
 }
@@ -12,7 +12,7 @@ class AddRoomsDialog extends StatefulWidget {
 class _AddRoomsDialog extends State<AddRoomsDialog> {
   String roomName = "";
   String roomDesc = "";
-  List rooms;
+  Map rooms;
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _AddRoomsDialog extends State<AddRoomsDialog> {
                 onTap: () {
                   print(index);
                   var allRooms = this.rooms;
-                  allRooms.removeAt(index);
+                  allRooms.remove(index);
                   this.setState(() {
                     rooms = allRooms;
                   });
@@ -112,7 +112,10 @@ class _AddRoomsDialog extends State<AddRoomsDialog> {
             text: "Add Room",
             onTap: () {
               var allRooms = this.rooms;
-              allRooms.add({"name": this.roomName, "desc": this.roomDesc});
+              allRooms[this.roomName] = {
+                "name": this.roomName,
+                "desc": this.roomDesc
+              };
               this.setState(() {
                 this.rooms = allRooms;
               });

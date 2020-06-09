@@ -9,14 +9,15 @@ import 'package:timeline_list/timeline_model.dart';
 
 class RoomTimeline extends StatefulWidget {
   final String title;
-  const RoomTimeline({this.title, Key key}) : super(key: key);
+  final List<String> allRooms;
+  const RoomTimeline({this.title, this.allRooms, key}) : super(key: key);
   @override
   _RoomTimelineState createState() => _RoomTimelineState();
 }
 
 class _RoomTimelineState extends State<RoomTimeline> {
   String selectedRoom = "Room 1";
-  String randomStartTime = "Room 1";
+  // String randomStartTime = "Room 1";
   List<Schedule> allSchedules;
   List<TimelineModel> timelineItems = [];
   @override
@@ -36,23 +37,12 @@ class _RoomTimelineState extends State<RoomTimeline> {
             Expanded(
                 child: Timeline(
                     children: timelineItems, position: TimelinePosition.Left)),
-            Text(this.randomStartTime),
+            // Text(this.randomStartTime),
             DropdownButton<String>(
               value: selectedRoom,
               isExpanded: true,
               icon: Icon(Icons.arrow_drop_down),
-              items: [
-                DropdownMenuItem<String>(
-                    value: "Room 1", child: Text("Room 1")),
-                DropdownMenuItem<String>(
-                    value: "Room 2", child: Text("Room 2")),
-                DropdownMenuItem<String>(
-                    value: "Room 3", child: Text("Room 3")),
-                DropdownMenuItem<String>(
-                    value: "Room 4", child: Text("Room 4")),
-                DropdownMenuItem<String>(
-                    value: "Room 5", child: Text("Room 5")),
-              ],
+              items: this.getRooms(),
               onChanged: (String room) {
                 setState(() {
                   this.selectedRoom = room;
@@ -75,15 +65,20 @@ class _RoomTimelineState extends State<RoomTimeline> {
     List<Schedule> allSchedules = [];
     FirebaseDatabase.instance
         .reference()
-        .child("rooms")
+        .child("Orgs")
+        .child(widget.title)
+        .child("allRooms")
         .child(selectedRoom)
+        .child("schedules")
         .once()
         .then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
-      values.forEach((key, val) {
-        allSchedules
-            .add(Schedule(val["startTime"], val["endTime"], val["desc"]));
-      });
+      try {
+        values.forEach((key, val) {
+          allSchedules
+              .add(Schedule(val["startTime"], val["endTime"], val["desc"]));
+        });
+      } catch (e) {}
       setState(() {
         this.allSchedules = allSchedules;
       });
@@ -96,17 +91,19 @@ class _RoomTimelineState extends State<RoomTimeline> {
 
   void updateSchedules() {
     List<TimelineModel> items = [];
-    this.allSchedules.forEach((schedule) {
-      items.add(TimelineModel(
-          SingleSchedule(
-            startTime: formatTime(DateTime.parse(schedule.startTime)),
-            endTime: formatTime(DateTime.parse(schedule.endTime)),
-            desc: schedule.desc,
-          ),
-          position: TimelineItemPosition.right,
-          iconBackground: Colors.redAccent,
-          icon: Icon(Icons.blur_circular)));
-    });
+    try {
+      this.allSchedules.forEach((schedule) {
+        items.add(TimelineModel(
+            SingleSchedule(
+              startTime: formatTime(DateTime.parse(schedule.startTime)),
+              endTime: formatTime(DateTime.parse(schedule.endTime)),
+              desc: schedule.desc,
+            ),
+            position: TimelineItemPosition.right,
+            iconBackground: Colors.redAccent,
+            icon: Icon(Icons.blur_circular)));
+      });
+    } catch (e) {}
     setState(() {
       this.timelineItems = items;
     });
@@ -128,5 +125,14 @@ class _RoomTimelineState extends State<RoomTimeline> {
       var dateB = DateTime.parse(b.startTime);
       return dateA.compareTo(dateB);
     });
+  }
+
+  List<DropdownMenuItem<String>> getRooms() {
+    List<DropdownMenuItem<String>> rooms = [];
+    widget.allRooms.forEach((roomName) {
+      rooms.add(
+          DropdownMenuItem<String>(value: roomName, child: Text(roomName)));
+    });
+    return rooms;
   }
 }
