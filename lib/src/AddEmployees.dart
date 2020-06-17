@@ -146,7 +146,7 @@ class _AddEmployeeDialog extends State<AddEmployeeDialog> {
               if (this.employeeEmail.length > 4) {
                 var allEmployees = this.employees;
                 allEmployees.add(
-                    {"email": this.employeeEmail, "team": this.teamSelected});
+                    {"email": this.employeeEmail, "team": this.teamSelected, "active" : false});
                 this.setState(() {
                   this.employees = allEmployees;
                 });

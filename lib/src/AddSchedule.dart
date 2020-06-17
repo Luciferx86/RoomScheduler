@@ -33,6 +33,7 @@ String formatTime(DateTime time) {
 
 class ScheduleAdderState extends State<ScheduleAdder> {
   String selectedRoom = "Room 1";
+  String interruptingSchedule = "";
   DateTime startTime = DateTime.now();
   DateTime endTime = DateTime.now().add(Duration(hours: 1));
   String desc;
@@ -193,7 +194,7 @@ class ScheduleAdderState extends State<ScheduleAdder> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text("Invalid Schedule"),
+                        title: Text("Room Unavailable due to this booking : \n " + interruptingSchedule),
                       );
                     });
               }
@@ -240,18 +241,30 @@ class ScheduleAdderState extends State<ScheduleAdder> {
       log("comparing" + startTime.compareTo(newStartTime).toString());
       if(startTime.isBefore(newStartTime) && endTime.isBefore(newEndTime) && endTime.isAfter(newStartTime)){
         log("invallid");
+        this.setState((){
+          interruptingSchedule = formatTime(startTime) + " - " + formatTime(endTime);
+        });
         retVal = false;
       }
       if(startTime.isAfter(newStartTime) && endTime.isAfter(newEndTime) && startTime.isBefore(newEndTime)){
         log("invallid");
+        this.setState((){
+          interruptingSchedule = formatTime(startTime) + " - " + formatTime(endTime);
+        });
         retVal = false;
       }
       if(startTime.isBefore(newStartTime) && endTime.isAfter(newEndTime)){
         log("invallid");
+        this.setState((){
+          interruptingSchedule = formatTime(startTime) + " - " + formatTime(endTime);
+        });
         retVal = false;
       }
       if(startTime.isAfter(newStartTime) && endTime.isBefore(newEndTime)){
         log("invallid");
+        this.setState((){
+          interruptingSchedule = formatTime(startTime) + " - " + formatTime(endTime);
+        });
         retVal = false;
       }
       // if (startTime.compareTo(newStartTime) > 0 &&
