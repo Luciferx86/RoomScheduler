@@ -16,7 +16,7 @@ class MyButton extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: RoomSchedulerColors.orange),
+                color: AppColors.orange),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
               child: Text(

@@ -24,7 +24,7 @@ class _RoomTimelineState extends State<RoomTimeline> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: RoomSchedulerColors.orange,
+          backgroundColor: AppColors.orange,
           title: Text(
             widget.title,
             style: TextStyle(color: Colors.black),

@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
         '/dashboard': (context) => Dashboard(),
         '/create': (context) => CreateAccount(),
         '/add': (context) => AddOrganisation(),
+        '/new': (context) => Container(),
       },
       theme: ThemeData(
         // This is the theme of your application.

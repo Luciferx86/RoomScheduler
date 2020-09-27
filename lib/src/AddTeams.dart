@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:room_scheduler/models/team_model.dart';
 import 'package:room_scheduler/utils/MyButton.dart';
 import '../utils/CustomEditText.dart';
 
 class AddTeamsDialog extends StatefulWidget {
   final onDone;
   final List allTeams;
+
   const AddTeamsDialog({Key key, this.onDone, this.allTeams}) : super(key: key);
+
   _AddTeamsDialog createState() => _AddTeamsDialog();
 }
 
 class _AddTeamsDialog extends State<AddTeamsDialog> {
   String teamName = "";
-  List teams;
+  List<TeamModel> teams;
 
   @override
   void initState() {
@@ -51,7 +54,7 @@ class _AddTeamsDialog extends State<AddTeamsDialog> {
                 thickness: 2,
                 color: Colors.black,
               ),
-              Container(width: 180, child: Text(object["name"])),
+              Container(width: 180, child: Text(object.teamName)),
               VerticalDivider(
                 width: 8,
                 thickness: 2,
@@ -80,10 +83,8 @@ class _AddTeamsDialog extends State<AddTeamsDialog> {
       height: 500,
       child: Column(
         children: <Widget>[
-          CustomEditText(
-            label: "Team Name",
-            hint: "Android Team",
-            isPass: false,
+          DefTextFormField(
+            fieldName: "Team Name",
             onChanged: (val) {
               this.setState(() {
                 this.teamName = val;
@@ -96,10 +97,9 @@ class _AddTeamsDialog extends State<AddTeamsDialog> {
             onTap: () {
               print("l = " + this.teamName.length.toString());
               if (this.teamName.length > 4) {
-                var allTeams = this.teams;
-                allTeams.add({"name": this.teamName});
                 this.setState(() {
-                  this.teams = allTeams;
+                  this.teams.add(TeamModel(teamName: this.teamName));
+                  this.teamName = "";
                 });
               } else {
                 showDialog(

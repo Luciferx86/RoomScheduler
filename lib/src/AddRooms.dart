@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:room_scheduler/models/room_model.dart';
 import 'package:room_scheduler/utils/MyButton.dart';
 import '../utils/CustomEditText.dart';
 
 class AddRoomsDialog extends StatefulWidget {
   final onDone;
-  final Map allRooms;
+  final List<RoomModel> allRooms;
+
   const AddRoomsDialog({Key key, this.onDone, this.allRooms}) : super(key: key);
+
   _AddRoomsDialog createState() => _AddRoomsDialog();
 }
 
 class _AddRoomsDialog extends State<AddRoomsDialog> {
   String roomName = "";
   String roomDesc = "";
-  Map rooms;
+  List<RoomModel> rooms;
 
   @override
   void initState() {
@@ -52,13 +55,13 @@ class _AddRoomsDialog extends State<AddRoomsDialog> {
                 thickness: 2,
                 color: Colors.black,
               ),
-              Container(width: 100, child: Text(object["name"])),
+              Container(width: 100, child: Text(object.roomName)),
               VerticalDivider(
                 width: 8,
                 thickness: 2,
                 color: Colors.black,
               ),
-              Container(width: 100, child: Text(object["desc"])),
+              Container(width: 100, child: Text(object.roomDesc)),
               VerticalDivider(
                 width: 8,
                 thickness: 2,
@@ -87,20 +90,16 @@ class _AddRoomsDialog extends State<AddRoomsDialog> {
       height: 600,
       child: Column(
         children: <Widget>[
-          CustomEditText(
-            label: "Room Name",
-            hint: "Room 1",
-            isPass: false,
+          DefTextFormField(
+            fieldName: "Room Name",
             onChanged: (val) {
               this.setState(() {
                 this.roomName = val;
               });
             },
           ),
-          CustomEditText(
-            label: "Remarks",
-            hint: "Near the cafeteria",
-            isPass: false,
+          DefTextFormField(
+            fieldName: "Remarks",
             onChanged: (val) {
               this.setState(() {
                 this.roomDesc = val;
@@ -112,10 +111,8 @@ class _AddRoomsDialog extends State<AddRoomsDialog> {
             text: "Add Room",
             onTap: () {
               var allRooms = this.rooms;
-              allRooms[this.roomName] = {
-                "name": this.roomName,
-                "desc": this.roomDesc
-              };
+              allRooms.add(
+                  RoomModel(roomName: this.roomName, roomDesc: this.roomDesc));
               this.setState(() {
                 this.rooms = allRooms;
               });

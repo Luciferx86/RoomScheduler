@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:room_scheduler/utils/Colors.dart';
 import 'package:room_scheduler/utils/MyButton.dart';
 import 'package:room_scheduler/utils/Logo.dart';
-import 'package:room_scheduler/utils/CustomEditText.dart';
 import 'package:room_scheduler/utils/Strings.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,9 +16,11 @@ class _LoginPageState extends State<LoginPage> {
   String email = "";
   String orgName = "";
   String password = "";
+  String foundPass = "";
   String confirmPass = "";
   String btnText = "Login";
   String loginMode = "initial";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: RoomSchedulerColors.orange,
+        backgroundColor: AppColors.orange,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -41,10 +42,11 @@ class _LoginPageState extends State<LoginPage> {
             TextFormField(
                 style: TextStyle(fontSize: 20),
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.email),
-                  hintText: "user@example.com",
-                  labelText: 'Email',
+                  icon: Icon(Icons.phone),
+                  hintText: "8080808080",
+                  labelText: 'Phone No.',
                 ),
+                keyboardType: TextInputType.phone,
                 obscureText: false,
                 onChanged: (String val) {
                   setState(() {
@@ -55,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
                   // This optional block of code can be used to run
                   // code when the user saves the form.
                 }),
+            SizedBox(height: 20,),
             // this.showPass
             //     ? renderPassFields()
             //     : SizedBox(
@@ -129,12 +132,21 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void doLogin() {}
+  void doLogin() {
+    String email = this.email;
+    String pass = this.password;
+    if (pass == foundPass) {
+      log("Lets goooo");
+    } else {
+      log("wrong pass");
+    }
+  }
 
   void doCreate() {}
 
   void updateLoginStatus(BuildContext context) {
     bool userFound = false;
+    String fPass;
     bool status = false;
     log("logging");
     FirebaseDatabase.instance
@@ -143,41 +155,46 @@ class _LoginPageState extends State<LoginPage> {
         .once()
         .then((DataSnapshot snapshot) {
       Map values = snapshot.value;
-      values.forEach((key, val) {
-        List emps = val["allEmployees"];
-        emps.forEach((obj) {
-          if (obj["email"] == this.email) {
-            log("found user");
-            log(key);
-            status = obj["active"];
-            userFound = true;
-            this.setState(() {
-              orgName = key;
-            });
+      if (values != null) {
+        values.forEach((key, val) {
+          List emps = val["allEmployees"];
+          emps.forEach((obj) {
+            if (obj["email"] == this.email) {
+              log("found user");
+              log(key);
+              status = obj["active"];
+              userFound = true;
+              fPass = obj["password"];
+              this.setState(() {
+                orgName = key;
+              });
+            }
+          });
+
+          if (userFound) {
+            log("found");
+            log(orgName);
+            if (!status) {
+              //user found, but not activated
+              log("user found, not active");
+              this.setState(() {
+                btnText = "Create Account";
+                loginMode = "create";
+              });
+            } else {
+              log("user found, active");
+              //user found, and activated
+              this.setState(() {
+                loginMode = "login";
+                foundPass = fPass;
+              });
+            }
+          } else {
+            //user not found
+            log("not foundsss");
           }
         });
-        if (userFound) {
-          log("found");
-          log(orgName);
-          if (!status) {
-            //user found, but not activated
-            log("user found, not active");
-            this.setState(() {
-              btnText = "Create Account";
-              loginMode = "create";
-            });
-          } else {
-            log("user found, active");
-            //user found, and activated
-            this.setState(() {
-              loginMode = "login";
-            });
-          }
-        } else {
-          //user not found
-          log("not foundsss");
-        }
-      });
+      }
     });
   }
 
@@ -199,9 +216,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget renderPassFieldsForCreation() {
     return (Column(children: <Widget>[
-      SizedBox(
-        height: 20,
-      ),
       TextFormField(
         style: TextStyle(fontSize: 20),
         decoration: const InputDecoration(

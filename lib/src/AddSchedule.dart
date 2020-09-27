@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:room_scheduler/utils/Colors.dart';
 import 'package:room_scheduler/utils/CustomEditText.dart';
-import 'package:room_scheduler/utils/FirebaseKeys.dart';
 import 'package:room_scheduler/utils/MyButton.dart';
 import 'package:room_scheduler/utils/Schedule.dart';
-import 'package:room_scheduler/utils/Strings.dart';
 
 class ScheduleAdder extends StatefulWidget {
   final String title;
@@ -48,7 +46,7 @@ class ScheduleAdderState extends State<ScheduleAdder> {
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: RoomSchedulerColors.orange,
+        backgroundColor: AppColors.orange,
       ),
       body: Center(
           child: Column(
@@ -136,10 +134,8 @@ class ScheduleAdderState extends State<ScheduleAdder> {
           SizedBox(
             height: 50,
           ),
-          CustomEditText(
-            label: "Description",
-            hint: "Android Team's Standup",
-            isPass: false,
+          DefTextFormField(
+            fieldName: "Description",
             onChanged: (String text) {
               log("setting desc $text");
               setState(() {

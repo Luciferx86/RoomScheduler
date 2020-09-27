@@ -46,7 +46,7 @@ class SingleSchedule extends StatelessWidget {
                 ))
           ],
         ),
-        color: RoomSchedulerColors.green,
+        color: AppColors.green,
         nip: BubbleNip.leftTop,
         margin: BubbleEdges.only(top: 10),
       ),

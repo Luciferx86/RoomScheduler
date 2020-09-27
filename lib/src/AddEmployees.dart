@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:room_scheduler/models/team_model.dart';
 import 'package:room_scheduler/utils/MyButton.dart';
 import '../utils/CustomEditText.dart';
 
 class AddEmployeeDialog extends StatefulWidget {
   final onDone;
   final List allEmployees;
-  final List allTeams;
+  final List<TeamModel> allTeams;
   const AddEmployeeDialog(
       {Key key, this.onDone, this.allEmployees, this.allTeams})
       : super(key: key);
@@ -13,9 +14,9 @@ class AddEmployeeDialog extends StatefulWidget {
 }
 
 class _AddEmployeeDialog extends State<AddEmployeeDialog> {
-  String employeeEmail = "";
+  String employeeNumber = "";
   List employees;
-  List teams;
+  List<TeamModel> teams;
   String teamSelected;
 
   @override
@@ -24,7 +25,7 @@ class _AddEmployeeDialog extends State<AddEmployeeDialog> {
     super.initState();
     employees = widget.allEmployees;
     teams = widget.allTeams;
-    teamSelected = teams[0]["name"];
+    teamSelected = teams[0].teamName;
   }
 
   @override
@@ -66,7 +67,7 @@ class _AddEmployeeDialog extends State<AddEmployeeDialog> {
                   child: Column(
                     children: <Widget>[
                       Text(
-                        object["email"],
+                        object["number"],
                         textAlign: TextAlign.center,
                         maxLines: 2,
                       ),
@@ -106,8 +107,8 @@ class _AddEmployeeDialog extends State<AddEmployeeDialog> {
     List<DropdownMenuItem<String>> allTeams = [];
     this.teams.forEach((team) {
       allTeams.add(DropdownMenuItem(
-        child: Text(team["name"]),
-        value: team["name"],
+        child: Text(team.teamName),
+        value: team.teamName,
       ));
     });
     return allTeams;
@@ -119,13 +120,11 @@ class _AddEmployeeDialog extends State<AddEmployeeDialog> {
       height: 600,
       child: Column(
         children: <Widget>[
-          CustomEditText(
-            label: "Employee Email",
-            hint: "johnwatson@mail.com",
-            isPass: false,
+          DefTextFormField(
+            fieldName: "Employee Phone No.",
             onChanged: (val) {
               this.setState(() {
-                this.employeeEmail = val;
+                this.employeeNumber = val;
               });
             },
           ),
@@ -143,10 +142,10 @@ class _AddEmployeeDialog extends State<AddEmployeeDialog> {
           MyButton(
             text: "Add Employee",
             onTap: () {
-              if (this.employeeEmail.length > 4) {
+              if (this.employeeNumber.length == 10) {
                 var allEmployees = this.employees;
                 allEmployees.add(
-                    {"email": this.employeeEmail, "team": this.teamSelected, "active" : false});
+                    {"number": this.employeeNumber, "team": this.teamSelected, "active" : false});
                 this.setState(() {
                   this.employees = allEmployees;
                 });

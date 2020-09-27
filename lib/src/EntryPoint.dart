@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:room_scheduler/utils/Colors.dart';
@@ -35,7 +34,7 @@ class EntryPoint extends StatelessWidget {
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: RoomSchedulerColors.orange,
+        backgroundColor: AppColors.orange,
       ),
       body: Container(
         child: Column(

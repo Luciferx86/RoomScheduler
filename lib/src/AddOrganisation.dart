@@ -1,24 +1,24 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_overlay/loading_overlay.dart';
+import 'package:progress_timeline/progress_timeline.dart';
+import 'package:room_scheduler/Onboarding/all_employees.dart';
+import 'package:room_scheduler/Onboarding/all_rooms.dart';
+import 'package:room_scheduler/Onboarding/all_teams.dart';
+import 'package:room_scheduler/Onboarding/name_and_logo.dart';
+import 'package:room_scheduler/common/commun-utils.dart';
+import 'package:room_scheduler/models/room_model.dart';
+import 'package:room_scheduler/models/team_model.dart';
 import 'package:room_scheduler/src/AddEmployees.dart';
 import 'package:room_scheduler/src/AddRooms.dart';
 import 'package:room_scheduler/src/AddTeams.dart';
-import 'package:room_scheduler/utils/ButtonWithText.dart';
 import 'package:room_scheduler/utils/Colors.dart';
-import 'package:room_scheduler/utils/CustomEditText.dart';
-import 'package:room_scheduler/utils/MyButton.dart';
 import 'package:room_scheduler/utils/Strings.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:room_scheduler/utils/two_bottom_buttons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:path/path.dart' as path;
-
-import '../utils/MyButton.dart';
 
 class AddOrganisation extends StatefulWidget {
   @override
@@ -27,23 +27,204 @@ class AddOrganisation extends StatefulWidget {
 
 class _AddOrganisationState extends State<AddOrganisation> {
   String orgName = "";
-  File logo;
-  Map allRooms = new Map();
-  List allTeams = [];
+  File orgLogo;
+  List<RoomModel> allRooms = new List();
+  List<TeamModel> allTeams = [];
   List allEmployees = [];
+  OrgNameAndLogo setupChild;
+  AddTeams teamsChild;
+  AddRooms roomsChild;
+  AddEmployees employeesChild;
+
+  List<String> teams = [];
+
+  Widget currentStageChild;
   var admin;
-  bool isLoading = false;
+  AddOrgStages currentStage = AddOrgStages.ORG_SETUP;
   String logoText = "No Logo Added";
+  List<SingleState> allStages = [
+    SingleState(stateTitle: "Setup"),
+    SingleState(stateTitle: "Teams"),
+    SingleState(stateTitle: "Employees"),
+    SingleState(stateTitle: "Rooms"),
+  ];
 
-  Future getImageFromGallery() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+  ProgressTimeline timeline;
 
-    setState(() {
-      if (image != null) {
-        logo = image;
-        logoText = path.basename(image.path);
-      }
-    });
+  @override
+  void initState() {
+    timeline = new ProgressTimeline(
+      states: allStages,
+      connectorColor: AppColors.orange,
+      iconSize: 28,
+    );
+    setupChild = new OrgNameAndLogo(
+      iniOrgName: orgName,
+      orgLogo: orgLogo,
+      onSavedOrgLogo: (File logo) {
+        setState(() {
+          orgLogo = logo;
+        });
+      },
+      onChangedOrgName: (String val) {
+        setState(() {
+          orgName = val;
+        });
+      },
+    );
+    employeesChild = new AddEmployees();
+    roomsChild = new AddRooms();
+    teamsChild = new AddTeams(
+      teams: teams,
+      addTeam: (String teamName) {
+        setState(() {
+          teams.add(teamName);
+        });
+      },
+      deleteTeam: (String teamName) {
+        setState(() {
+          teams.remove(teamName);
+        });
+      },
+    );
+    currentStageChild = setupChild;
+    super.initState();
+  }
+
+  void gotoPreviousStage() {
+    switch (currentStage) {
+      case AddOrgStages.ORG_SETUP:
+        break;
+      case AddOrgStages.ADD_TEAMS:
+        setState(() {
+          currentStageChild = setupChild;
+        });
+        currentStage = AddOrgStages.ORG_SETUP;
+        timeline.gotoPreviousStage();
+        break;
+      case AddOrgStages.ADD_EMPLOYEES:
+        setState(() {
+          currentStageChild = teamsChild;
+        });
+        currentStage = AddOrgStages.ADD_TEAMS;
+        break;
+      case AddOrgStages.ADD_ROOMS:
+        setState(() {
+          currentStageChild = employeesChild;
+        });
+        currentStage = AddOrgStages.ADD_EMPLOYEES;
+        timeline.gotoPreviousStage();
+        break;
+      case AddOrgStages.SETUP_COMPLETE:
+        setState(() {
+          currentStageChild = roomsChild;
+        });
+        currentStage = AddOrgStages.ADD_ROOMS;
+        timeline.gotoPreviousStage();
+        break;
+    }
+  }
+
+  void gotoNextStage() {
+    switch (currentStage) {
+      case AddOrgStages.ORG_SETUP:
+        if (setupChild.formKey.currentState.validate()) {
+          if (orgLogo != null) {
+            timeline.gotoNextStage();
+            setState(() {
+              currentStageChild = teamsChild;
+            });
+            currentStage = AddOrgStages.ADD_TEAMS;
+          } else {
+            CommonUtils.showToastMessage("Select company logo");
+          }
+        }
+        break;
+
+      case AddOrgStages.ADD_TEAMS:
+        if (teamsChild.formKey.currentState.validate()) {
+          timeline.gotoNextStage();
+          setState(() {
+            currentStageChild = employeesChild;
+          });
+          currentStage = AddOrgStages.ADD_EMPLOYEES;
+        }
+        break;
+      case AddOrgStages.ADD_EMPLOYEES:
+        if (employeesChild.formKey.currentState.validate()) {
+          timeline.gotoNextStage();
+          setState(() {
+            currentStageChild = roomsChild;
+          });
+          currentStage = AddOrgStages.ADD_ROOMS;
+        }
+        break;
+      case AddOrgStages.ADD_ROOMS:
+        if (roomsChild.formKey.currentState.validate()) {
+          timeline.gotoNextStage();
+          setState(() {
+//            currentStageChild = teamsChild;
+          });
+          currentStage = AddOrgStages.SETUP_COMPLETE;
+        }
+        break;
+      case AddOrgStages.SETUP_COMPLETE:
+        CommonUtils.showToastMessage("Setup Complete");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
+    this.admin = {"number": arguments["number"]};
+    if (arguments != null) {
+      print(arguments["number"]);
+      log(arguments["number"]);
+    }
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text(
+          Strings.loginPageTitle,
+          style: TextStyle(color: Colors.black),
+        ),
+        iconTheme: IconThemeData(color: Colors.black),
+        backgroundColor: AppColors.orange,
+      ),
+      bottomNavigationBar: TwoBottomButtons(
+        btnOneText: "Previous",
+        btnTwoText: "Next",
+        btnOneFunction: gotoPreviousStage,
+        btnTwoFunction: gotoNextStage,
+      ),
+      body: Card(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            SizedBox(
+              height: 30,
+            ),
+            timeline,
+            Text(
+              " Add Organisation \n details:",
+              style: TextStyle(fontSize: 25),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              child: currentStageChild,
+            ),
+            SizedBox(
+              height: 100,
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   void addRooms() {
@@ -51,7 +232,7 @@ class _AddOrganisationState extends State<AddOrganisation> {
         context: context,
         builder: (BuildContext context) => AddRoomsDialog(
               allRooms: this.allRooms,
-              onDone: (Map allRooms) {
+              onDone: (List<RoomModel> allRooms) {
                 this.setState(() {
                   this.allRooms = allRooms;
                 });
@@ -97,6 +278,15 @@ class _AddOrganisationState extends State<AddOrganisation> {
         .replaceAll("&", "");
   }
 
+  List<Map> convertList(List<dynamic> myList) {
+    List<Map> listOfMaps = [];
+    myList.forEach((object) {
+      Map map = object.toMap();
+      listOfMaps.add(map);
+    });
+    return listOfMaps;
+  }
+
   void createOrg() {
     String error = "";
     if (this.allEmployees.length == 0) {
@@ -108,7 +298,7 @@ class _AddOrganisationState extends State<AddOrganisation> {
     if (this.allRooms.length == 0) {
       error = "No rooms added.";
     }
-    if (this.logo == null) {
+    if (this.orgLogo == null) {
       error = "No logo selected";
     }
     if (this.orgName == "") {
@@ -116,31 +306,32 @@ class _AddOrganisationState extends State<AddOrganisation> {
     }
     if (error == "") {
       this.setState(() {
-        this.isLoading = true;
+//        this.isLoading = true;
       });
-      FirebaseDatabase()
-          .reference()
-          .child("Orgs")
-          .child(getFirebaseRefName(this.orgName))
-          .set({
-        "orgName": this.orgName,
-        "allRooms": this.allRooms,
-        "allTeams": this.allTeams,
-        "allEmployees": this.allEmployees,
-        "admin": admin
-      }).then((onValue) async {
+
+      CollectionReference users =
+          Firestore.instance.collection("Organizations");
+
+      users.add({
+        this.orgName: {
+          "orgName": this.orgName,
+          "allRooms": convertList(this.allRooms),
+          "allTeams": convertList(this.allTeams),
+          "allEmployees": this.allEmployees,
+          "admin": admin
+        }
+      }).then((value) async {
+        log(value.toString());
+        log("Added to firestore");
         StorageUploadTask uploadTask = FirebaseStorage.instance
             .ref()
             .child("Orgs")
             .child(getFirebaseRefName(this.orgName))
             .child("logo")
-            .putFile(this.logo);
+            .putFile(this.orgLogo);
         await uploadTask.onComplete;
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('orgName', this.orgName);
-        this.setState(() {
-          isLoading = false;
-        });
         showDialog(
             barrierDismissible: false,
             context: context,
@@ -162,151 +353,14 @@ class _AddOrganisationState extends State<AddOrganisation> {
               );
             });
       });
-    } else {
-      showDialog(
-          // barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Error"),
-              content: Text(error),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          });
     }
   }
+}
 
-  @override
-  Widget build(BuildContext context) {
-    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
-    this.admin = {"email": arguments["email"], "pass": arguments["pass"]};
-    if (arguments != null) {
-      print(arguments["email"]);
-      log(arguments["email"]);
-    }
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          Strings.loginPageTitle,
-          style: TextStyle(color: Colors.black),
-        ),
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: RoomSchedulerColors.orange,
-      ),
-      body: LoadingOverlay(
-        isLoading: this.isLoading,
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 30,
-              ),
-              Text(
-                " Add Organisation \n details:",
-                style: TextStyle(fontSize: 25),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              CustomEditText(
-                  label: "Organisation Name",
-                  hint: "Stanford Ltd.",
-                  isPass: false,
-                  onChanged: (val) {
-                    this.setState(() {
-                      orgName = val;
-                    });
-                  }),
-              SizedBox(
-                height: 30,
-              ),
-              MyButton(
-                text: "Select Organisation Logo",
-                onTap: this.getImageFromGallery,
-              ),
-              // ButtonWithText(
-              //   buttonText: "Select Organisation Logo",
-              //   text: this.logoText,
-              //   onTap: this.getImageFromGallery,
-              // ),
-              this.logo == null
-                  ? SizedBox()
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(
-                          width: 40,
-                        ),
-                        Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(image: FileImage(logo)),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        InkWell(
-                            onTap: () {
-                              setState(() {
-                                logoText = "No Logo Added";
-                                logo = null;
-                              });
-                            },
-                            child: Icon(Icons.cancel)),
-                      ],
-                    ),
-              SizedBox(
-                height: 30,
-              ),
-              ButtonWithText(
-                buttonText: "Add Rooms",
-                text: this.allRooms.length.toString() + " rooms added",
-                onTap: this.addRooms,
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              ButtonWithText(
-                  buttonText: "Add Teams",
-                  text: this.allTeams.length.toString() + " teams Added",
-                  onTap: this.addTeams),
-              SizedBox(
-                height: 30,
-              ),
-              ButtonWithText(
-                buttonText: "Add Employees",
-                text: this.allEmployees.length.toString() + " employees added",
-                onTap: this.addEmployees,
-              ),
-              SizedBox(
-                height: 30,
-              ),
-
-              MyButton(
-                text: "Create",
-                onTap: () {
-                  print("creating");
-                  this.createOrg();
-                },
-              ),
-              SizedBox(
-                height: 100,
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+enum AddOrgStages {
+  ORG_SETUP,
+  ADD_ROOMS,
+  ADD_TEAMS,
+  ADD_EMPLOYEES,
+  SETUP_COMPLETE
 }
