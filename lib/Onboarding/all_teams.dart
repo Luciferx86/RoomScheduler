@@ -27,24 +27,18 @@ class _AddTeamsState extends State<AddTeams> {
 
   @override
   Widget build(BuildContext context) {
+    final screendata = MediaQuery.of(context);
     return Form(
         key: widget.formKey,
-        child: Container(
+        child: SingleChildScrollView(
           child: Center(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
                   child: DefTextFormField(
                     controller: teamNameController,
-                    validator: (val) {
-                      if (val.isEmpty)
-                        return "Enter Organisation Name";
-                      else if (val.length < 3)
-                        return "Organisation Name must be atleast 3 characters";
-                      else
-                        return null;
-                    },
                     explicitReadOnly: false,
                     icon: Icon(Icons.group),
                     fieldName: "Team Name",
@@ -67,8 +61,9 @@ class _AddTeamsState extends State<AddTeams> {
                     }
                   },
                 ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10, left: 5, right: 5),
+                Container(
+                  height: screendata.size.height / 2.8,
+                  margin: EdgeInsets.only(top: 10, left: 5, right: 5),
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,

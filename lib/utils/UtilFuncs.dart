@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:toast/toast.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class UtilFuncs {
-  static void showToast(String msg, BuildContext context) {
-    Toast.show(msg, context,
-        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+  static void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIos: 2,
+      backgroundColor: Colors.black87,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   void showLoader(BuildContext context) {

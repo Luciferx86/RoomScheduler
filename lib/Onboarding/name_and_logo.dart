@@ -87,9 +87,6 @@ class _OrgNameAndLogoState extends State<OrgNameAndLogo> {
               }
             },
           ),
-          SizedBox(
-            height: 30,
-          ),
         ],
       ),
     );

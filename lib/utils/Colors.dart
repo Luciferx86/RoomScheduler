@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:toast/toast.dart';
 
 class AppColors {
   static Color pink = Color(0XFFFB788D);
@@ -14,8 +13,4 @@ class AppColors {
   static Color facebook = Color(0xFF4564A4);
   static Color google = Color(0xFFDF513C);
 
-  static void showToast(String msg, BuildContext context) {
-    Toast.show(msg, context,
-        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-  }
 }

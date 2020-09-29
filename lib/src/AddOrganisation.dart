@@ -10,6 +10,7 @@ import 'package:room_scheduler/Onboarding/all_rooms.dart';
 import 'package:room_scheduler/Onboarding/all_teams.dart';
 import 'package:room_scheduler/Onboarding/name_and_logo.dart';
 import 'package:room_scheduler/common/commun-utils.dart';
+import 'package:room_scheduler/models/employee_model.dart';
 import 'package:room_scheduler/models/room_model.dart';
 import 'package:room_scheduler/models/team_model.dart';
 import 'package:room_scheduler/src/AddEmployees.dart';
@@ -37,6 +38,7 @@ class _AddOrganisationState extends State<AddOrganisation> {
   AddEmployees employeesChild;
 
   List<String> teams = [];
+  List<EmployeeModel> employees = [];
 
   Widget currentStageChild;
   var admin;
@@ -56,7 +58,6 @@ class _AddOrganisationState extends State<AddOrganisation> {
     timeline = new ProgressTimeline(
       states: allStages,
       connectorColor: AppColors.orange,
-      iconSize: 28,
     );
     setupChild = new OrgNameAndLogo(
       iniOrgName: orgName,
@@ -72,7 +73,20 @@ class _AddOrganisationState extends State<AddOrganisation> {
         });
       },
     );
-    employeesChild = new AddEmployees();
+    employeesChild = new AddEmployees(
+      employeeList: employees,
+      teamsList: teams,
+      addEmployee: (EmployeeModel emp) {
+        setState(() {
+          employees.add(emp);
+        });
+      },
+      removeEmployee: (EmployeeModel emp) {
+        setState(() {
+          employees.remove(emp);
+        });
+      },
+    );
     roomsChild = new AddRooms();
     teamsChild = new AddTeams(
       teams: teams,
@@ -107,6 +121,7 @@ class _AddOrganisationState extends State<AddOrganisation> {
           currentStageChild = teamsChild;
         });
         currentStage = AddOrgStages.ADD_TEAMS;
+        timeline.gotoPreviousStage();
         break;
       case AddOrgStages.ADD_ROOMS:
         setState(() {
@@ -142,21 +157,25 @@ class _AddOrganisationState extends State<AddOrganisation> {
         break;
 
       case AddOrgStages.ADD_TEAMS:
-        if (teamsChild.formKey.currentState.validate()) {
+        if (teams.length > 0) {
           timeline.gotoNextStage();
           setState(() {
             currentStageChild = employeesChild;
           });
           currentStage = AddOrgStages.ADD_EMPLOYEES;
+        } else {
+          CommonUtils.showToastMessage("Add atleast 1 team");
         }
         break;
       case AddOrgStages.ADD_EMPLOYEES:
-        if (employeesChild.formKey.currentState.validate()) {
+        if (employees.length > 0) {
           timeline.gotoNextStage();
           setState(() {
             currentStageChild = roomsChild;
           });
           currentStage = AddOrgStages.ADD_ROOMS;
+        } else {
+          CommonUtils.showToastMessage("Add atleast 1 employee");
         }
         break;
       case AddOrgStages.ADD_ROOMS:
@@ -197,31 +216,31 @@ class _AddOrganisationState extends State<AddOrganisation> {
         btnOneFunction: gotoPreviousStage,
         btnTwoFunction: gotoNextStage,
       ),
-      body: Card(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            SizedBox(
-              height: 30,
-            ),
-            timeline,
-            Text(
-              " Add Organisation \n details:",
-              style: TextStyle(fontSize: 25),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              child: currentStageChild,
-            ),
-            SizedBox(
-              height: 100,
-            )
-          ],
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: 2.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                height: 20,
+              ),
+              timeline,
+              Text(
+                " Add Organisation \n details:",
+                style: TextStyle(fontSize: 25),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              currentStageChild,
+            ],
+          ),
         ),
       ),
     );

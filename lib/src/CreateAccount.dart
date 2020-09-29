@@ -24,6 +24,7 @@ class _CreateAccountState extends State<CreateAccount> {
   bool otpExpired = false;
   String verificationID = "";
   String otpText = "";
+
   void createAccount() {
     print(this.number);
     Navigator.pushNamed(context, '/add', arguments: {"number": number});
@@ -48,14 +49,14 @@ class _CreateAccountState extends State<CreateAccount> {
             this.setState(() {
               isLoading = false;
             });
-            UtilFuncs.showToast("Verified", context);
+            UtilFuncs.showToast("Verified");
             Navigator.pushReplacementNamed(context, '/add',
                 arguments: {"number": number});
           }).catchError((err) {
             this.setState(() {
               isLoading = false;
             });
-            UtilFuncs.showToast(err, context);
+            UtilFuncs.showToast(err);
           });
         } on Exception {
           this.setState(() {
@@ -177,7 +178,7 @@ class _CreateAccountState extends State<CreateAccount> {
         codeSent: (String verificationId, [int forceResendingToken]) {
           log(verificationId);
           log(otpText);
-          UtilFuncs.showToast("OTP sent", context);
+          UtilFuncs.showToast("OTP sent");
           this.setState(() {
             btnText = "Verify OTP";
             otpGenerated = true;

@@ -22,8 +22,8 @@ class TeamsItem extends StatelessWidget {
         padding: const EdgeInsets.only(
           left: 8.0,
           right: 8.0,
-          top: 10.0,
-          bottom: 10.0,
+          top: 5.0,
+          bottom: 5.0,
         ),
         color: Color(0x15000000),
         onPressed: () {},
@@ -36,7 +36,7 @@ class TeamsItem extends StatelessWidget {
                   onTap: () {},
                   child: Icon(
                     Icons.group,
-                    size: 30.0,
+                    size: 25.0,
                     color: Colors.blue[300],
                   ),
                 ),
@@ -49,7 +49,7 @@ class TeamsItem extends StatelessWidget {
                       maxLines: 3,
                       style: TextStyle(
                         letterSpacing: 0.25,
-                        fontSize: 22.0,
+                        fontSize: 18.0,
                         color: AppColors.gunMetal,
                       ),
                     ),
