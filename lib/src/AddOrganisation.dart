@@ -12,10 +12,7 @@ import 'package:room_scheduler/Onboarding/name_and_logo.dart';
 import 'package:room_scheduler/common/commun-utils.dart';
 import 'package:room_scheduler/models/employee_model.dart';
 import 'package:room_scheduler/models/room_model.dart';
-import 'package:room_scheduler/models/team_model.dart';
-import 'package:room_scheduler/src/AddEmployees.dart';
 import 'package:room_scheduler/src/AddRooms.dart';
-import 'package:room_scheduler/src/AddTeams.dart';
 import 'package:room_scheduler/utils/Colors.dart';
 import 'package:room_scheduler/utils/Strings.dart';
 import 'package:room_scheduler/utils/two_bottom_buttons.dart';
@@ -29,16 +26,13 @@ class AddOrganisation extends StatefulWidget {
 class _AddOrganisationState extends State<AddOrganisation> {
   String orgName = "";
   File orgLogo;
-  List<RoomModel> allRooms = new List();
-  List<TeamModel> allTeams = [];
-  List allEmployees = [];
+  List<RoomModel> allRooms = [];
+  List<String> allTeams = [];
+  List<EmployeeModel> allEmployees = [];
   OrgNameAndLogo setupChild;
   AddTeams teamsChild;
   AddRooms roomsChild;
   AddEmployees employeesChild;
-
-  List<String> teams = [];
-  List<EmployeeModel> employees = [];
 
   Widget currentStageChild;
   var admin;
@@ -74,30 +68,30 @@ class _AddOrganisationState extends State<AddOrganisation> {
       },
     );
     employeesChild = new AddEmployees(
-      employeeList: employees,
-      teamsList: teams,
+      employeeList: allEmployees,
+      teamsList: allTeams,
       addEmployee: (EmployeeModel emp) {
         setState(() {
-          employees.add(emp);
+          allEmployees.add(emp);
         });
       },
       removeEmployee: (EmployeeModel emp) {
         setState(() {
-          employees.remove(emp);
+          allEmployees.remove(emp);
         });
       },
     );
     roomsChild = new AddRooms();
     teamsChild = new AddTeams(
-      teams: teams,
+      teams: allTeams,
       addTeam: (String teamName) {
         setState(() {
-          teams.add(teamName);
+          allTeams.add(teamName);
         });
       },
       deleteTeam: (String teamName) {
         setState(() {
-          teams.remove(teamName);
+          allTeams.remove(teamName);
         });
       },
     );
@@ -157,7 +151,7 @@ class _AddOrganisationState extends State<AddOrganisation> {
         break;
 
       case AddOrgStages.ADD_TEAMS:
-        if (teams.length > 0) {
+        if (allTeams.length > 0) {
           timeline.gotoNextStage();
           setState(() {
             currentStageChild = employeesChild;
@@ -168,7 +162,7 @@ class _AddOrganisationState extends State<AddOrganisation> {
         }
         break;
       case AddOrgStages.ADD_EMPLOYEES:
-        if (employees.length > 0) {
+        if (allEmployees.length > 0) {
           timeline.gotoNextStage();
           setState(() {
             currentStageChild = roomsChild;
@@ -254,35 +248,6 @@ class _AddOrganisationState extends State<AddOrganisation> {
               onDone: (List<RoomModel> allRooms) {
                 this.setState(() {
                   this.allRooms = allRooms;
-                });
-                Navigator.pop(context);
-              },
-            ));
-  }
-
-  void addEmployees() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) => AddEmployeeDialog(
-              allTeams: this.allTeams,
-              allEmployees: this.allEmployees,
-              onDone: (List allEmployees) {
-                this.setState(() {
-                  this.allEmployees = allEmployees;
-                });
-                Navigator.pop(context);
-              },
-            ));
-  }
-
-  void addTeams() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) => AddTeamsDialog(
-              allTeams: this.allTeams,
-              onDone: (List allTeams) {
-                this.setState(() {
-                  this.allTeams = allTeams;
                 });
                 Navigator.pop(context);
               },

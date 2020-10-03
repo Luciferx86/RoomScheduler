@@ -11,7 +11,9 @@ class AddTeams extends StatefulWidget {
   final Function deleteTeam;
   final Function addTeam;
 
-  AddTeams({this.addTeam, this.deleteTeam, this.teams});
+  AddTeams({this.addTeam,
+    this.deleteTeam,
+    this.teams});
 
   _AddTeamsState createState() => _AddTeamsState();
 }

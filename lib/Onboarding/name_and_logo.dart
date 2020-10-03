@@ -6,19 +6,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:room_scheduler/utils/CustomEditText.dart';
 import 'package:room_scheduler/utils/MyButton.dart';
 
-class OrgNameAndLogo extends StatefulWidget {
-  final Function onChangedOrgName;
-
+class OrgNameAndLogo extends StatelessWidget {
   final formKey = GlobalKey<FormState>();
 
   final File orgLogo;
   final String iniOrgName;
 
   final Function onSavedOrgLogo;
-
-  GlobalKey getFormKey() {
-    return formKey;
-  }
+  final Function onChangedOrgName;
 
   OrgNameAndLogo(
       {this.onChangedOrgName,
@@ -26,17 +21,10 @@ class OrgNameAndLogo extends StatefulWidget {
       this.iniOrgName,
       this.onSavedOrgLogo});
 
-  _OrgNameAndLogoState createState() => _OrgNameAndLogoState();
-}
-
-class _OrgNameAndLogoState extends State<OrgNameAndLogo> {
-  String orgName;
-  File orgLogo;
-
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: widget.formKey,
+      key: formKey,
       child: Column(
         children: [
           Padding(
@@ -50,11 +38,11 @@ class _OrgNameAndLogoState extends State<OrgNameAndLogo> {
                 else
                   return null;
               },
-              iniValue: widget.iniOrgName,
+              iniValue: iniOrgName,
               explicitReadOnly: false,
               icon: Icon(Icons.account_balance),
               fieldName: "Organisation Name",
-              onChanged: (val) => widget.onChangedOrgName(val),
+              onChanged: (val) => onChangedOrgName(val),
             ),
           ),
           SizedBox(
@@ -77,13 +65,8 @@ class _OrgNameAndLogoState extends State<OrgNameAndLogo> {
             text: "Select Organisation Logo",
             onTap: () async {
               File image = await getImageFromGallery();
-
               if (image != null) {
-                setState(() {
-                  orgLogo = image;
-                });
-
-                widget.onSavedOrgLogo(image);
+                onSavedOrgLogo(image);
               }
             },
           ),
